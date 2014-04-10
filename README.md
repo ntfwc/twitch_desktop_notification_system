@@ -32,7 +32,7 @@ Add the usernames of people which you want channel notifications for to followed
 #Running
 
 * Windows:
-	double click run.bat
+	Double-click run.bat
 
 * Linux/Other:
 	open a terminal in the folder and run
