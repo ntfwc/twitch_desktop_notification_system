@@ -26,13 +26,37 @@ class AvatarStorageSystem(object):
     def close(self):
         raise NotImplementedError()
     
-    def storeAvatar(self, user, avatar):
+    def commitUncommittedChanges(self):
         raise NotImplementedError()
     
-    def getAvatar(self, user):
+    def rollbackUncommittedChanges(self):
         raise NotImplementedError()
-
-    def updateAvatar(self, user, oldAvatar, newAvatar):
+    
+    def storeUserAvatarURL(self, user, avatarURL):
+        raise NotImplementedError()
+    
+    def updateUserAvatarURL(self, user, avatarURL):
+        raise NotImplementedError()
+    
+    def deleteUser(self, user):
+        raise NotImplementedError()
+    
+    def storeCachedAvatar(self, avatar):
+        raise NotImplementedError()
+    
+    def updateCachedAvatar(self, avatar):
+        raise NotImplementedError()
+    
+    def deleteCachedAvatar(self, url):
+        raise NotImplementedError()
+    
+    def getUserAvatarURL(self, user):
+        raise NotImplementedError()
+    
+    def getAvatar(self, avatarURL):
+        raise NotImplementedError()
+    
+    def cleanCachedAvatarIfUnused(self, removedURL):
         raise NotImplementedError()
 
 import sqlite3
