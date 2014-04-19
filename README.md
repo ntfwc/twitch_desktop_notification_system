@@ -35,14 +35,14 @@ Add the usernames of people which you want channel notifications for to followed
 	Double-click run.bat
 
 * Linux/Other:
-	open a terminal in the folder and run
+	open a terminal emulator in the folder and run
 > python main.py
 
-It checks TwitchTV immediately. It will tell you who is streaming at that moment, then it will check periodically for changes. Each notification will have a pop-up that stays up about 30 seconds (unless you close it earlier). It will also print it out in the command line window/terminal with the time, so you won't miss notifications if they occur while you are away from the computer.
+It checks TwitchTV immediately. It will tell you who is streaming at that moment, then it will check periodically for changes. Each notification will have a pop-up that stays up about 30 seconds (unless you close it earlier). It will also print it out in the command line window/terminal emulator with the time, so you won't miss notifications if they occur while you are away from the computer.
 
 #Stopping
 
-Just go to the command line/terminal it is running in and press Ctrl+C.
+Just go to the command line/terminal emulator it is running in and press Ctrl+C.
 
 #Technical Notes
 
