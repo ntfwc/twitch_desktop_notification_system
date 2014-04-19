@@ -40,10 +40,18 @@ Add the usernames of people which you want channel notifications for to followed
 
 It checks TwitchTV immediately. It will tell you who is streaming at that moment, then it will check periodically for changes. Each notification will have a pop-up that stays up about 30 seconds (unless you close it earlier). It will also print it out in the command line window/terminal emulator with the time, so you won't miss notifications if they occur while you are away from the computer.
 
+Note: I don't see why you might do it, but you shouldn't run two instances at once in the same directory. If you do, you could corrupt the avatar cache. Not a big deal as you would just have to clear the cache to fix it (see below), but still something to note.
+
 #Stopping
 
 Just go to the command line/terminal emulator it is running in and press Ctrl+C. That will stop the program, and it will print out "Application Terminated". Then you can close the window. 
 Note: Not doing Ctrl+C and just closing the window shouldn't cause any ill effects as it uses a database for persistent storage, but using Ctrl+C is still the suggested method.
+
+#Clearing the cache
+
+Simply go to the cache folder and delete the contents. Do this if the cache is corrupted. 
+
+In theory, after there are plenty of users you stop following with it and/or lots of avatar changes, this could reclaim a little bit of disk space, but it shouldn't be significant.
 
 #Technical Notes
 
