@@ -42,7 +42,8 @@ It checks TwitchTV immediately. It will tell you who is streaming at that moment
 
 #Stopping
 
-Just go to the command line/terminal emulator it is running in and press Ctrl+C.
+Just go to the command line/terminal emulator it is running in and press Ctrl+C. That will stop the program, and it will print out "Application Terminated". Then you can close the window. 
+Note: Not doing Ctrl+C and just closing the window shouldn't cause any ill effects as it uses a database for persistent storage, but using Ctrl+C is still the suggested method.
 
 #Technical Notes
 
