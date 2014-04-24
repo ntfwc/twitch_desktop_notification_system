@@ -27,6 +27,8 @@ A cross-platform program designed to give the user desktop notifications when th
 
 #Set-up
 
+Note: If you are cloning the repository, rather than downloading a release. You'll have to add a folder called cache along with a followedList.txt file.
+
 Add the usernames of people which you want channel notifications for to followedList.txt, one per line. Note: You can have blank lines and comments can be created by prefixing a line with #. See example_followedList.txt.
 
 #Running
