@@ -22,8 +22,17 @@ def __tryToGetHeaderValue(messageObject, headerName):
     else:
         return None
 
+CONTENT_LENGTH_HEADER = "content-length"
+
+def __tryToGetContentLength(messageObject):
+    contentLengthString = __tryToGetHeaderValue(messageObject, CONTENT_LENGTH_HEADER)
+    if contentLengthString == None:
+        return None
+    else:
+        return int(contentLengthString)
+
 def __downloadData(openURL, messageObject, maxDownloadSize):
-    contentLength = int(__tryToGetHeaderValue(messageObject, "content-length"))
+    contentLength = __tryToGetContentLength(messageObject)
     if contentLength != None:
         if contentLength > maxDownloadSize:
             raise MaxDownloadSizeExceededException()

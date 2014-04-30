@@ -18,7 +18,7 @@ from InternetIOExceptions import HTTPResponseCodeException, HTTPContentLengthExc
 
 GET_METHOD = "GET"
 HTTP_OK_CODE = 200
-CONTENT_LENGTH_HEADER = "content_length"
+CONTENT_LENGTH_HEADER = "content-length"
 
 class PersistentHTTPDownloader(object):
     def __init__(self, host, timeout):
@@ -37,10 +37,17 @@ class PersistentHTTPDownloader(object):
     def setHeader(self, header, value):
         self.headers[header] = value
 
+    def __tryToGetContentLength(self, response):
+        contentLengthText = response.getheader(CONTENT_LENGTH_HEADER, None)
+        if contentLengthText == None:
+            return None
+
+        return int(contentLengthText)
+
     def __readResponseData(self, response, maxDownloadSize):
-        contentLength = response.getheader(CONTENT_LENGTH_HEADER, None)
+        contentLength = self.__tryToGetContentLength(response)
         if contentLength != None:
-            if contentLength > maxDataSize:
+            if contentLength > maxDownloadSize:
                 raise MaxDownloadSizeExceededException()
             data = response.read(contentLength)
             if len(data) != contentLength:
