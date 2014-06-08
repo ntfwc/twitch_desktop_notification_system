@@ -67,12 +67,7 @@ def downloadURLContent(url, maxDownloadSize, timeoutTime):
         u.close()
         
 
-class HTTPObject(object):
-    def __init__(self, data, lastModified, expires, date):
-        self.data = data
-        self.lastModified = lastModified
-        self.expires = expires
-        self.date = date
+from HTTPObject import HTTPObject
 
 
 HTTP_NOT_MODIFIED_CODE = 304
