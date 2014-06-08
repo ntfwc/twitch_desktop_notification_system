@@ -15,10 +15,14 @@
 
 from httplib import HTTPConnection, HTTPSConnection
 from InternetIOExceptions import HTTPResponseCodeException, HTTPContentLengthException, MaxDownloadSizeExceededException, SafeHTTPException
+from HTTPObject import HTTPObject
 
 GET_METHOD = "GET"
 HTTP_OK_CODE = 200
 CONTENT_LENGTH_HEADER = "content-length"
+LAST_MODIFIED_HEADER = "last-modified"
+EXPIRES_HEADER = "expires"
+DATE_HEADER = "date"
 
 class PersistentHTTPDownloader(object):
     def __init__(self, host, timeout):
@@ -37,8 +41,11 @@ class PersistentHTTPDownloader(object):
     def setHeader(self, header, value):
         self.headers[header] = value
 
+    def __tryToGetHeaderValue(self, response, headerName):
+        return response.getheader(headerName, None)
+
     def __tryToGetContentLength(self, response):
-        contentLengthText = response.getheader(CONTENT_LENGTH_HEADER, None)
+        contentLengthText = self.__tryToGetHeaderValue(response, CONTENT_LENGTH_HEADER)
         if contentLengthText == None:
             return None
 
@@ -59,43 +66,52 @@ class PersistentHTTPDownloader(object):
 
         return data
 
-    def __sendRequestAndReadResponse(self, objectPath, maxDownloadSize):
-        self.connection.request(GET_METHOD, objectPath, headers=self.headers)
-        response = self.connection.getresponse()
-        
-        data = self.__readResponseData(response, maxDownloadSize)
-        if response.status != HTTP_OK_CODE:
-            raise HTTPResponseCodeException(response.status)
-        
-        return data
-
     def __assertConnection(self):
         if self.connection == None:
             self.refresh()
             if self.connection == None:
                 raise Exception("Failed to refresh connection")
 
-    def get(self, objectPath, maxDownloadSize):
+    def __sendRequestAndReadHTTPObject(self, objectPath, maxDownloadSize):
+        self.connection.request(GET_METHOD, objectPath, headers=self.headers)
+        response = self.connection.getresponse()
+        
+        data = self.__readResponseData(response, maxDownloadSize)
+        if response.status != HTTP_OK_CODE:
+            raise HTTPResponseCodeException(response.status)
+
+        lastModified = self.__tryToGetHeaderValue(response, LAST_MODIFIED_HEADER)
+        expires = self.__tryToGetHeaderValue(response, EXPIRES_HEADER)
+        date = self.__tryToGetHeaderValue(response, DATE_HEADER)
+        
+        return HTTPObject(data, lastModified, expires, date)
+
+    def getHTTPObject(self, objectPath, maxDownloadSize):
         self.__assertConnection()
         
         try:
-            return self.__sendRequestAndReadResponse(objectPath, maxDownloadSize)
+            return self.__sendRequestAndReadHTTPObject(objectPath, maxDownloadSize)
         except SafeHTTPException, e:
             raise e
         except Exception,e:
             self.close()
             raise e
 
-    def getWithRetries(self, objectPath, maxDownloadSize, maxNumberOfRetries):
+    def get(self, objectPath, maxDownloadSize):
+        return self.getHTTPObject(objectPath, maxDownloadSize).data
+
+    def getHTTPObjectWithRetries(self, objectPath, maxDownloadSize, maxNumberOfRetries):
         lastException = None
         for i in xrange(1+maxNumberOfRetries):
             try:
-                return self.get(objectPath, maxDownloadSize)
+                return self.getHTTPObject(objectPath, maxDownloadSize)
             except Exception,e:
                 lastException = e
 
         raise lastException
 
+    def getWithRetries(self, objectPath, maxDownloadSize, maxNumberOfRetries):
+        return self.getHTTPObjectWithRetries(objectPath, maxDownloadSize, maxNumberOfRetries).data
 
     def close(self):
         if self.connection != None:
