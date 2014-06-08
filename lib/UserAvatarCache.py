@@ -15,7 +15,7 @@
 
 from TwitchAPI import getUserAvatarURL
 from ImageParsing import parseDataToPixBuf, filterImageDataToVersionWithinSizeRestriction
-from InternetIO.URLDownloading import downloadHTTPObject, downloadHTTPObjectIfModified
+from InternetIO.ConnectionCachingFetcher import ConnectionCachingFetcher
 from AvatarStorageSystem import Avatar
 from AvatarStorageSystem import SQLiteAvatarStorageSystem
 
@@ -28,6 +28,7 @@ class PersistentAvatarCache(object):
     def __init__(self, filePath, maxAvatarSizeValue):
         self.storageSystem = SQLiteAvatarStorageSystem(filePath)
         self.maxAvatarSizeValue = maxAvatarSizeValue
+        self.avatarFetcher = ConnectionCachingFetcher(TIMEOUT_TIME)
 
     def open(self):
         self.storageSystem.open()
@@ -41,7 +42,7 @@ class PersistentAvatarCache(object):
         return Avatar(url, data, lastModified)
 
     def __downloadAvatar(self, avatarURL):
-        httpObj = downloadHTTPObject(avatarURL, MAX_DOWNLOAD_SIZE, TIMEOUT_TIME)
+        httpObj = self.avatarFetcher.downloadHTTPObject(avatarURL, MAX_DOWNLOAD_SIZE)
         return self.__convertHTTPObjectToAvatar(avatarURL, httpObj)
 
     def __updateRecordedAvatarURL(self, user, oldURL, newURL):
@@ -61,7 +62,7 @@ class PersistentAvatarCache(object):
         return avatarURL
 
     def __downloadAvatarIfUnmodified(self, avatarURL, lastModified):
-        httpObj = downloadHTTPObjectIfModified(avatarURL, lastModified, MAX_DOWNLOAD_SIZE, TIMEOUT_TIME)
+        httpObj = self.avatarFetcher.downloadHTTPObjectIfModified(avatarURL, lastModified, MAX_DOWNLOAD_SIZE)
         if httpObj == None:
             return None
         return self.__convertHTTPObjectToAvatar(avatarURL, httpObj)
@@ -96,6 +97,12 @@ class PersistentAvatarCache(object):
             self.storageSystem.rollbackUncommittedChanges()
             raise e
 
+    def tryToGetOldAvatar(self, user):
+        recordedAvatarURL = self.storageSystem.getUserAvatarURL(user)
+        if recordedAvatarURL == None:
+            return None
+        return recordedAvatarURL, self.storageSystem.getAvatar(recordedAvatarURL).data
+
 class UserAvatarCache(object):
     def __init__(self, apiConnection, maxAvatarSizeValue):
         self.apiConnection = apiConnection
@@ -129,13 +136,25 @@ class UserAvatarCache(object):
         else:
             return self.avatarURLDict[user]
 
+    def __getFallbackAvatar(self, user):
+        urlAndAvatar = self.persistentCache.tryToGetOldAvatar(user)
+        if urlAndAvatar == None:
+            return None
+        avatarURL, imageData = urlAndAvatar
+        pixBuf = parseDataToPixBuf(imageData)
+        print "Falling back to recorded avatar for %s" % user
+        
+        self.avatarDict[avatarURL] = pixBuf
+        return pixBuf
+
     def getAvatar(self, user):
         avatarURL = self.__getAvatarURL(user)
         if avatarURL not in self.avatarDict:
             try:
                 avatar = self.__getUserAvatarAsPixBufImage(user, avatarURL)
-            except:
-                return None
+            except Exception,e:
+                print "Exception while fetching avatar for %s: %s" % (user, e.__class__.__name__ + " : " + str(e))
+                return self.__getFallbackAvatar(user)
             self.avatarDict[avatarURL] = avatar
             return avatar
         else:
