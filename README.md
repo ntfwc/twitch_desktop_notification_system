@@ -5,7 +5,7 @@ A cross-platform program designed to give the user desktop notifications when th
 #Features
 
 * Efficiency:
-	* Uses a persistent https connection for the api.
+	* Uses a persistent https connections.
 	* Has a cache for user avatars. Will download avatars as needed, and on subsequent runs, it will only re-download an avatar if it is modified (just like the refresh button does on a Web Browser).
 	* The program spends the vast majority of its time sleeping, or waiting on IO, so it uses very little CPU time.
 
