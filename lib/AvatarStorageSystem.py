@@ -183,6 +183,12 @@ FROM cached_avatars
 WHERE url == ?;
 """
 
+QUERY_GET_USER_AVATAR_DATA = """
+SELECT data
+FROM user_avatar_urls JOIN cached_avatars ON avatar_url == url
+WHERE user = ?;
+"""
+
 UPDATE_USER_AVATAR_URL_COMMAND = """
 UPDATE user_avatar_urls
 SET avatar_url = ?
@@ -317,6 +323,13 @@ class SQLiteAvatarStorageSystem(AvatarStorageSystem):
         lastModified = str(avatarRow[1])
 
         return Avatar(avatarURL, data, lastModified)
+
+    def getUserAvatarData(self, user):
+        avatarRow = self.__getResultOfSingleRowResultQueryWithParameters(QUERY_GET_USER_AVATAR_DATA, (user,))
+        if avatarRow == None:
+            return None
+        data = str(avatarRow[0])
+        return data
 
     def cleanCachedAvatarIfUnused(self, removedURL):
         if self.doesURLHaveUser(removedURL):
