@@ -97,11 +97,8 @@ class PersistentAvatarCache(object):
             self.storageSystem.rollbackUncommittedChanges()
             raise e
 
-    def tryToGetOldAvatar(self, user):
-        recordedAvatarURL = self.storageSystem.getUserAvatarURL(user)
-        if recordedAvatarURL == None:
-            return None
-        return recordedAvatarURL, self.storageSystem.getAvatar(recordedAvatarURL).data
+    def tryToGetOldAvatarData(self, user):
+        return self.storageSystem.getUserAvatarData(user)
 
 class UserAvatarCache(object):
     def __init__(self, apiConnection, maxAvatarSizeValue):
@@ -109,6 +106,7 @@ class UserAvatarCache(object):
         self.avatarURLDict = {}
         self.avatarDict = {}
         self.persistentCache = PersistentAvatarCache(CACHE_FILE, maxAvatarSizeValue)
+        self.fallBackDict = {}
 
     def open(self):
         self.persistentCache.open()
@@ -137,17 +135,19 @@ class UserAvatarCache(object):
             return self.avatarURLDict[user]
 
     def __getFallbackAvatar(self, user):
-        urlAndAvatar = self.persistentCache.tryToGetOldAvatar(user)
-        if urlAndAvatar == None:
+        imageData = self.persistentCache.tryToGetOldAvatarData(user)
+        if imageData == None:
             return None
-        avatarURL, imageData = urlAndAvatar
         pixBuf = parseDataToPixBuf(imageData)
         print "Falling back to recorded avatar for %s" % user
         
-        self.avatarDict[avatarURL] = pixBuf
+        self.fallBackDict[user] = pixBuf
         return pixBuf
 
     def getAvatar(self, user):
+        if user in self.fallBackDict:
+            return self.fallBackDict[user]
+        
         avatarURL = self.__getAvatarURL(user)
         if avatarURL not in self.avatarDict:
             try:
