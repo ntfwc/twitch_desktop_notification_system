@@ -1,3 +1,8 @@
+1.4
+-Gave avatar fallback a more direct query
+-Fixed avatar fallback behavior for subsequent requests
+-Changed Twitch code to assert a schema for avatar URLs (Will insert "http:" if the server leaves it out)
+
 1.3
 -(HTTP) Fixed content-length support
 -Improved avatar fallback. If the system fails to update the avatar of a user at a new URL, it will fallback to the cached version of the old URL.
