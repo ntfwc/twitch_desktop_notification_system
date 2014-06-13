@@ -39,6 +39,16 @@ class UserStreamData(object):
                self.streamTitle == other.streamTitle and
                self.streamGame == other.streamGame)
 
+FALLBACK_SCHEMA = "http:"
+
+def __assertSchema(URL):
+    if URL.startswith("http://") or URL.startswith("https://"):
+        return URL
+    elif URL.startswith("//"):
+        return FALLBACK_SCHEMA + URL
+    else:
+        return FALLBACK_SCHEMA + "//" + URL
+
 DEFAULT_AVATAR_URL = "http://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_150x150.png"
 
 def _parseUserStreamData(jsonData):
@@ -52,6 +62,8 @@ def _parseUserStreamData(jsonData):
         streamGame = streamData["game"]
         viewerCount = streamData["viewers"]
         avatarURL = channelData["logo"]
+        avatarURL = __assertSchema(avatarURL)
+        
         if avatarURL == None:
             avatarURL = DEFAULT_AVATAR_URL
         return UserStreamData(True, streamTitle, streamGame, viewerCount, avatarURL)
