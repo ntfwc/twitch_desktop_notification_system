@@ -42,6 +42,8 @@ class UserStreamData(object):
 FALLBACK_SCHEMA = "http:"
 
 def __assertSchema(URL):
+    if URL == None:
+        return None
     if URL.startswith("http://") or URL.startswith("https://"):
         return URL
     elif URL.startswith("//"):
