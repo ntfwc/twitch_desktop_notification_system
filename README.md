@@ -44,6 +44,8 @@ It checks TwitchTV immediately. It will tell you who is streaming at that moment
 
 Note: I don't see why you might do it, but you shouldn't run two instances at once in the same directory. If you do, you could corrupt the avatar cache. Not a big deal as you would just have to clear the cache to fix it (see below), but still something to note.
 
+Windows Note: If you use the standard command line, it does not fully support unicode and these characters may not show up properly in the window. However, they should still show up correctly in the actual notification.
+
 #Stopping
 
 Just go to the command line/terminal emulator it is running in and press Ctrl+C. That will stop the program, and it will print out "Application Terminated". Then you can close the window. 
