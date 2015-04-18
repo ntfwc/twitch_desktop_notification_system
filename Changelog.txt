@@ -1,3 +1,7 @@
+1.4.3
+-Fixed Python 2.7.9 compatibility by disabling a failing certificate validation
+-Switched to try except for safe cmd printing so we still print compatible unicode titles correctly.
+
 1.4.2
 -Bugfix for exception caused by Windows cmd and unicode characters
 
