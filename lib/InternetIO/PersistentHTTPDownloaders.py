@@ -121,10 +121,16 @@ class PersistentHTTPDownloader(object):
                 pass
             self.connection = None
 
+import ssl
 
 class PersistentHTTPSDownloader(PersistentHTTPDownloader):
     def refresh(self):
-        self.connection = HTTPSConnection(self.host, timeout=self.timeout)
+        #Disable verification as twitch's certificate is not compatible
+        if hasattr(ssl, "_create_unverified_context"):
+            self.connection = HTTPSConnection(self.host, timeout=self.timeout, context=ssl._create_unverified_context())
+        else:
+            #pre 2.7.9 versions don't have to worry about it
+            self.connection = HTTPSConnection(self.host, timeout=self.timeout)
         try:
             self.connection.connect()
         except:
