@@ -70,7 +70,7 @@ from time import strftime
 def printOutNotification(title, text):
     print "---- " + strftime("%I:%M %p ") + "---- " + title
     if text != None:
-        print text
+        print text.encode("utf-8")
 
 from time import sleep
 
