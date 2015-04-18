@@ -65,12 +65,18 @@ def createAndInitFollowedUserStatusMap(followedUsersList):
 def printException(exception):
     print exception.__class__.__name__ + " : " + exception.message
 
+def printToStdOutSafely(text):
+    try:
+        print text
+    except:
+        print text.encode("utf-8")
+
 from time import strftime
 
 def printOutNotification(title, text):
     print "---- " + strftime("%I:%M %p ") + "---- " + title
     if text != None:
-        print text.encode("utf-8")
+        printToStdOutSafely(text)
 
 from time import sleep
 
