@@ -81,12 +81,12 @@ def downloadTwitchAPIObjectWithARetry(apiConnection, requestPath):
 STREAM_REQUEST_STRING = "/kraken/streams/%s"
 
 def getUserStreamData(apiConnection, username):
-    requestPath = STREAM_REQUEST_STRING % (username,)
+    requestPath = STREAM_REQUEST_STRING % username
     data = downloadTwitchAPIObject(apiConnection, requestPath)
     return _parseUserStreamData(data)
 
 def getUserStreamDataWithARetry(apiConnection, username):
-    requestPath = STREAM_REQUEST_STRING % (username,)
+    requestPath = STREAM_REQUEST_STRING % username
     data = downloadTwitchAPIObjectWithARetry(apiConnection, requestPath)
     return _parseUserStreamData(data)
 
@@ -101,7 +101,7 @@ def _parseAvatarURL(jsonData):
 CHANNEL_REQUEST_STRING = "/kraken/channels/%s"
 
 def getUserAvatarURL(apiConnection, username):
-    requestPath = CHANNEL_REQUEST_STRING % (username,)
+    requestPath = CHANNEL_REQUEST_STRING % username
     data = downloadTwitchAPIObject(apiConnection, requestPath)
     return _parseAvatarURL(data)
 

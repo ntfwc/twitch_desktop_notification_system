@@ -29,9 +29,9 @@ def checkWorkingDir():
     if not followedUserListExists and not cacheDirExists:
         raise Exception("Could not see %s or the %s directory, is the working directory correct?" % (FOLLOWED_USERS_LIST_FILE, CACHE_DIR))
     if not followedUserListExists:
-        raise Exception("No %s file detected." % (FOLLOWED_USERS_LIST_FILE,))
+        raise Exception("No %s file detected." % FOLLOWED_USERS_LIST_FILE)
     if not cacheDirExists:
-        raise Exception("No %s directory detected" % (CACHE_DIR,))
+        raise Exception("No %s directory detected" % CACHE_DIR)
     
 
 import re
@@ -45,7 +45,7 @@ def getFollowedUsersList():
     for i in xrange(len(followedList)):
         username = followedList[i].lower()
         if not isUsernameValid(username):
-            raise Exception('username "%s", from followedlist, has invalid characters' % (username,))
+            raise Exception('username "%s", from followedlist, has invalid characters' % username)
         followedList[i] = username
     return followedList
 
@@ -85,14 +85,14 @@ class Main(object):
     def sendUserStreamStatusToNotificationSystem(self, user, previousStatus, userStreamStatus):
         if userStreamStatus.isStreaming:
             if previousStatus.isStreaming != True:
-                title = "%s is Streaming!" % (user,)
+                title = "%s is Streaming!" % user
                 text = "Title: %s\nGame: %s\nViewer Count: %s" % (userStreamStatus.streamTitle, userStreamStatus.streamGame, userStreamStatus.viewerCount)
                 self.avatarCache.setAvatarURL(user, userStreamStatus.avatarURL)
             else:
-                title = "%s has updated their stream information" % (user,)
+                title = "%s has updated their stream information" % user
                 text = "Title: %s\nGame: %s\nViewer Count: %s" % (userStreamStatus.streamTitle, userStreamStatus.streamGame, userStreamStatus.viewerCount)
         else:
-            title = "%s is no longer streaming" % (user,)
+            title = "%s is no longer streaming" % user
             text = None
 
         printOutNotification(title, text)
@@ -112,7 +112,7 @@ class Main(object):
                 except Exception, e:
                     printException(e)
                     #printTraceback()
-                    print "Warning: could not check status of user: %s" % (user,)
+                    print "Warning: could not check status of user: %s" % user
                     continue
                 firstUser = False
             else:
@@ -121,7 +121,7 @@ class Main(object):
                 except Exception, e:
                     printException(e)
                     #printTraceback()
-                    print "Warning: could not check status of user: %s" % (user,)
+                    print "Warning: could not check status of user: %s" % user
                     continue
             if not currentStatus.equals(recordedStatus):
                 self.followedUsersStatusMap[user] = currentStatus

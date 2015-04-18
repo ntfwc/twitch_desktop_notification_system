@@ -38,7 +38,7 @@ class ConnectionCachingFetcher(object):
         elif scheme == "https":
             return PersistentHTTPSDownloader(host, self.timeout)
         else:
-            raise Exception("Given unhandled scheme '%s'" % (scheme,))
+            raise Exception("Given unhandled scheme '%s'" % scheme)
 
     def __getConnection(self, host, scheme):
         if host in self.connectionCache:

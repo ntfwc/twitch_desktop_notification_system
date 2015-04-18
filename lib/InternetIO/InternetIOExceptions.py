@@ -18,7 +18,7 @@ class SafeHTTPException(Exception):
 
 class HTTPResponseCodeException(SafeHTTPException):
     def __init__(self, code):
-        Exception.__init__(self, "Given non ok response code: %s" % (code,) )
+        Exception.__init__(self, "Given non ok response code: %s" % code)
         self.code = code
 
 class HTTPContentLengthException(SafeHTTPException):
