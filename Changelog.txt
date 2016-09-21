@@ -1,3 +1,6 @@
+1.4.4
+-Updated the API to use a Client-ID because the Twitch API started to require it.
+
 1.4.3
 -Fixed Python 2.7.9 compatibility by disabling a failing certificate validation
 -Switched to try except for safe cmd printing so we still print compatible unicode titles correctly.
