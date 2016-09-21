@@ -19,11 +19,13 @@ import json
 API_HOST = "api.twitch.tv"
 TIMEOUT_TIME = 5.0
 API_ACCEPT_HEADER = "application/vnd.twitchtv.v2+json"
+CLIENT_ID = "pu6fhw9s3ywb5jxm269p8ef986kcbdu"
 
 
 def getAPIConnection():
     connection = PersistentHTTPSDownloader(API_HOST, TIMEOUT_TIME)
     connection.setHeader("Accept", API_ACCEPT_HEADER)
+    connection.setHeader("Client-ID", CLIENT_ID)
     return connection
 
 class UserStreamData(object):
