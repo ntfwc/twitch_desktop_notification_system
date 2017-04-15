@@ -129,7 +129,7 @@ class Main(object):
                     #printTraceback()
                     print "Warning: could not check status of user: %s" % user
                     continue
-            if not currentStatus.equals(recordedStatus):
+            if not currentStatus.hasSameBasicState(recordedStatus):
                 self.followedUsersStatusMap[user] = currentStatus
                 self.sendUserStreamStatusToNotificationSystem(user, recordedStatus, currentStatus)
 

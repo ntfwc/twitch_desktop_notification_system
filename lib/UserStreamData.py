@@ -8,10 +8,11 @@ class UserStreamData(object):
         self.viewerCount = viewerCount
         self.avatarURL = avatarURL
 
-    def equals(self, other):
+    def hasSameBasicState(self, other):
         return (self.isStreaming == other.isStreaming and
                self.streamTitle == other.streamTitle and
                self.streamGame == other.streamGame)
+
 
 DEFAULT_AVATAR_URL = "http://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_150x150.png"
 
