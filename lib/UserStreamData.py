@@ -35,12 +35,12 @@ def parseUserStreamData(jsonData):
 
 FALLBACK_SCHEMA = "http:"
 
-def __adjustSchema(URL):
-    if URL == None:
+def __adjustSchema(url):
+    if url == None:
         return None
-    if URL.startswith("http://") or URL.startswith("https://"):
-        return URL
-    elif URL.startswith("//"):
-        return FALLBACK_SCHEMA + URL
+    if url.startswith("http://") or url.startswith("https://"):
+        return url
+    elif url.startswith("//"):
+        return FALLBACK_SCHEMA + url
     else:
-        return FALLBACK_SCHEMA + "//" + URL
+        return FALLBACK_SCHEMA + "//" + url
