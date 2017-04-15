@@ -14,6 +14,7 @@
 ##    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from InternetIO.PersistentHTTPDownloaders import PersistentHTTPDownloader,PersistentHTTPSDownloader
+from UserStreamData import UserStreamData,parseUserStreamData
 import json
 
 API_HOST = "api.twitch.tv"
@@ -28,50 +29,6 @@ def getAPIConnection():
     connection.setHeader("Client-ID", CLIENT_ID)
     return connection
 
-class UserStreamData(object):
-    def __init__(self, isStreaming, streamTitle, streamGame, viewerCount, avatarURL):
-        self.isStreaming = isStreaming
-        self.streamTitle = streamTitle
-        self.streamGame = streamGame
-        self.viewerCount = viewerCount
-        self.avatarURL = avatarURL
-
-    def equals(self, other):
-        return (self.isStreaming == other.isStreaming and
-               self.streamTitle == other.streamTitle and
-               self.streamGame == other.streamGame)
-
-FALLBACK_SCHEMA = "http:"
-
-def __assertSchema(URL):
-    if URL == None:
-        return None
-    if URL.startswith("http://") or URL.startswith("https://"):
-        return URL
-    elif URL.startswith("//"):
-        return FALLBACK_SCHEMA + URL
-    else:
-        return FALLBACK_SCHEMA + "//" + URL
-
-DEFAULT_AVATAR_URL = "http://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_150x150.png"
-
-def _parseUserStreamData(jsonData):
-    parsedData = json.loads(jsonData)
-    streamData = parsedData["stream"]
-    if streamData == None:
-        return UserStreamData(False, None, None, None, None)
-    else:
-        channelData = streamData["channel"]
-        streamTitle = channelData["status"]
-        streamGame = streamData["game"]
-        viewerCount = streamData["viewers"]
-        avatarURL = channelData["logo"]
-        avatarURL = __assertSchema(avatarURL)
-        
-        if avatarURL == None:
-            avatarURL = DEFAULT_AVATAR_URL
-        return UserStreamData(True, streamTitle, streamGame, viewerCount, avatarURL)
-
 MAX_DOWNLOAD_SIZE = 20000
 
 def downloadTwitchAPIObject(apiConnection, requestPath):
@@ -85,12 +42,12 @@ STREAM_REQUEST_STRING = "/kraken/streams/%s"
 def getUserStreamData(apiConnection, username):
     requestPath = STREAM_REQUEST_STRING % username
     data = downloadTwitchAPIObject(apiConnection, requestPath)
-    return _parseUserStreamData(data)
+    return parseUserStreamData(data)
 
 def getUserStreamDataWithARetry(apiConnection, username):
     requestPath = STREAM_REQUEST_STRING % username
     data = downloadTwitchAPIObjectWithARetry(apiConnection, requestPath)
-    return _parseUserStreamData(data)
+    return parseUserStreamData(data)
 
 def _parseAvatarURL(jsonData):
     parsedData = json.loads(jsonData)
