@@ -1,5 +1,6 @@
 import unittest
 from lib.UserStreamData import UserStreamData,parseUserStreamData
+from tests.TestUtils import readFile
 
 RUNNING_STREAM_FILE="tests/v5-sample-responses/stream-running.json"
 OFFLINE_STREAM_FILE="tests/v5-sample-responses/stream-offline.json"
@@ -58,7 +59,3 @@ class UserStreamDataTest(unittest.TestCase):
         self.assertEquals(None, parsed.streamGame)
         self.assertEquals(None, parsed.viewerCount)
         self.assertEquals(None, parsed.avatarURL)
-
-def readFile(filePath):
-    with open(filePath) as f:
-        return f.read()
