@@ -13,9 +13,11 @@
 ##    You should have received a copy of the GNU General Public License
 ##    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from lib.TwitchAPI import getAPIConnection, UserStreamData, getUserStreamData, getUserStreamDataWithARetry
+from lib.TwitchAPI import getAPIConnection, getUserStreamData, getUserStreamDataWithARetry, getUserIds
+from lib.UserStreamData import UserStreamData
 from lib.NotificationSystems.NotificationSystem import NotificationSystem
 from lib.UserAvatarCache import UserAvatarCache
+from lib.UserIdStorageSystem import UserIdStorageSystem
 from lib.ListFileIO import readList
 
 FOLLOWED_USERS_LIST_FILE = "followedList.txt"
@@ -56,6 +58,18 @@ def createAndInitFollowedUserStatusMap(followedUsersList):
 
     return followedUsersStatusMap
 
+def fetchMissingUserIds(userIdStorage, followedUsersList, apiConnection):
+    usersWithMissingIds = []
+    for followedUser in followedUsersList:
+        if not userIdStorage.hasUserId(followedUser):
+            usersWithMissingIds.append(followedUser)
+    if len(usersWithMissingIds) == 0:
+        return
+    fetchedUserIdMap = getUserIds(apiConnection, usersWithMissingIds)
+    for userName, userId in fetchedUserIdMap.items():
+        userIdStorage.setUserId(userName.encode("utf-8"), userId.encode("utf-8"))
+    
+
 def printException(exception):
     print exception.__class__.__name__ + " : " + exception.message
 
@@ -75,12 +89,13 @@ def printOutNotification(title, text):
 from time import sleep
 
 class Main(object):
-    def __init__(self, apiConnection, followedUsersStatusMap, notificationSystem, avatarCache, cycleSleepTime):
+    def __init__(self, apiConnection, followedUsersStatusMap, notificationSystem, avatarCache, userIdMap, cycleSleepTime):
         self.apiConnection = apiConnection
         self.followedUsersStatusMap = followedUsersStatusMap
         self.notificationSystem = notificationSystem
         self.avatarCache = avatarCache
         self.cycleSleepTime = cycleSleepTime
+        self.userIdMap = userIdMap
 
     def sendUserStreamStatusToNotificationSystem(self, user, previousStatus, userStreamStatus):
         if userStreamStatus.isStreaming:
@@ -108,7 +123,7 @@ class Main(object):
         for user, recordedStatus in self.followedUsersStatusMap.iteritems():
             if firstUser:
                 try:
-                    currentStatus = getUserStreamDataWithARetry(self.apiConnection, user)
+                    currentStatus = getUserStreamDataWithARetry(self.apiConnection, self.userIdMap[user])
                 except Exception, e:
                     printException(e)
                     print "Warning: could not check status of user: %s" % user
@@ -116,7 +131,7 @@ class Main(object):
                 firstUser = False
             else:
                 try:
-                    currentStatus = getUserStreamData(self.apiConnection, user)
+                    currentStatus = getUserStreamData(self.apiConnection, self.userIdMap[user])
                 except Exception, e:
                     printException(e)
                     print "Warning: could not check status of user: %s" % user
@@ -134,7 +149,7 @@ class Main(object):
         self.updateStatusesAndNotifyOfChanges()
         sleep(self.cycleSleepTime)
         self.mainLoop()
-
+    
 
 CYCLE_SLEEP_TIME = 5*60
 
@@ -161,8 +176,14 @@ def main():
     avatarCache = UserAvatarCache(apiConnection, notificationSystem.getMaxImageSizeValue())
     avatarCache.open()
     
+    userIdStorage = UserIdStorageSystem()
+    
     try:
-        mainProg = Main(apiConnection, followedUsersStatusMap, notificationSystem, avatarCache, CYCLE_SLEEP_TIME)
+        fetchMissingUserIds(userIdStorage, followedUsersList, apiConnection)
+        userIdMap = userIdStorage.createMapCopy()
+        userIdStorage.close()
+        
+        mainProg = Main(apiConnection, followedUsersStatusMap, notificationSystem, avatarCache, userIdMap, CYCLE_SLEEP_TIME)
         mainProg.run()
     except KeyboardInterrupt:
         pass
