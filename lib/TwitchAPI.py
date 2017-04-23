@@ -15,11 +15,12 @@
 
 from InternetIO.PersistentHTTPDownloaders import PersistentHTTPDownloader,PersistentHTTPSDownloader
 from UserStreamData import UserStreamData,parseUserStreamData
+from UserIdParsing import parseUserIdMap
 import json
 
 API_HOST = "api.twitch.tv"
 TIMEOUT_TIME = 5.0
-API_ACCEPT_HEADER = "application/vnd.twitchtv.v2+json"
+API_ACCEPT_HEADER = "application/vnd.twitchtv.v5+json"
 CLIENT_ID = "pu6fhw9s3ywb5jxm269p8ef986kcbdu"
 
 
@@ -39,13 +40,13 @@ def downloadTwitchAPIObjectWithARetry(apiConnection, requestPath):
 
 STREAM_REQUEST_STRING = "/kraken/streams/%s"
 
-def getUserStreamData(apiConnection, username):
-    requestPath = STREAM_REQUEST_STRING % username
+def getUserStreamData(apiConnection, userId):
+    requestPath = STREAM_REQUEST_STRING % userId
     data = downloadTwitchAPIObject(apiConnection, requestPath)
     return parseUserStreamData(data)
 
-def getUserStreamDataWithARetry(apiConnection, username):
-    requestPath = STREAM_REQUEST_STRING % username
+def getUserStreamDataWithARetry(apiConnection, userId):
+    requestPath = STREAM_REQUEST_STRING % userId
     data = downloadTwitchAPIObjectWithARetry(apiConnection, requestPath)
     return parseUserStreamData(data)
 
@@ -59,9 +60,14 @@ def _parseAvatarURL(jsonData):
 
 CHANNEL_REQUEST_STRING = "/kraken/channels/%s"
 
-def getUserAvatarURL(apiConnection, username):
-    requestPath = CHANNEL_REQUEST_STRING % username
+def getUserAvatarURL(apiConnection, userId):
+    requestPath = CHANNEL_REQUEST_STRING % userId
     data = downloadTwitchAPIObject(apiConnection, requestPath)
     return _parseAvatarURL(data)
 
+USERS_REQUEST_STRING = "/kraken/users?login=%s"
 
+def getUserIds(apiConnection, users):
+    requestPath = USERS_REQUEST_STRING % ",".join(users)
+    data = downloadTwitchAPIObject(apiConnection, requestPath)
+    return parseUserIdMap(data)
