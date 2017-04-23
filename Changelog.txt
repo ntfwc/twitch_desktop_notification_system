@@ -1,3 +1,8 @@
+1.5
+-Updated to v5 of the Twitch API
+-Added a new cache file for the User IDs required in v5
+-Added tests for parsing
+
 1.4.4
 -Updated the API to use a Client-ID because the Twitch API started to require it.
 
