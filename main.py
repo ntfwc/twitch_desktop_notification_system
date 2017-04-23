@@ -56,12 +56,6 @@ def createAndInitFollowedUserStatusMap(followedUsersList):
 
     return followedUsersStatusMap
 
-##import sys,traceback
-##
-##def printTraceback():
-##    exc_type, exc_value, exc_traceback = sys.exc_info()
-##    traceback.print_exception(exc_type, exc_value, exc_traceback)
-
 def printException(exception):
     print exception.__class__.__name__ + " : " + exception.message
 
@@ -117,7 +111,6 @@ class Main(object):
                     currentStatus = getUserStreamDataWithARetry(self.apiConnection, user)
                 except Exception, e:
                     printException(e)
-                    #printTraceback()
                     print "Warning: could not check status of user: %s" % user
                     continue
                 firstUser = False
@@ -126,7 +119,6 @@ class Main(object):
                     currentStatus = getUserStreamData(self.apiConnection, user)
                 except Exception, e:
                     printException(e)
-                    #printTraceback()
                     print "Warning: could not check status of user: %s" % user
                     continue
             if not currentStatus.hasSameBasicState(recordedStatus):
